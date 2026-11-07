@@ -1,7 +1,7 @@
 """
 [INPUT]: 无依赖；纯数据与两个书写助手
 [OUTPUT]: 对外提供 GLYPHS（字符 → 笔画列表）、POSE（每字固定姿态）、COUNTERS（并排内白数）、SPACING（侧距例外）、METRICS（中心线网格）
-[POS]: scripts/scrawl 的设计真相源。pen.py 把它扫成墨迹，build.py 装进字体。改字形只改这里。
+[POS]: scripts/wiggle 的设计真相源。pen.py 把它扫成墨迹，build.py 装进字体。改字形只改这里。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 
 坐标是笔尖中心线，不是墨边：墨迹向外再长一个笔半径。

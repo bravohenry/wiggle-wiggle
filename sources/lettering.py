@@ -5,10 +5,10 @@
 """
 [INPUT]: 依赖 build.py 的 shape/glyph_layout/REGULAR（与 Regular 字体同一份排字规则、骨架、种子、位移与笔）；依赖 pen.py 的 sweep_strokes 与 _fit
 [OUTPUT]: letter（逐笔墨迹、笔尖轨迹与骨架点）、schedule（逐笔起止与进度关键帧）、open_path；命令行写书写数据 TS 模块
-[POS]: scripts/scrawl 的书写动画导出器。字体与手写字标共用骨架；vault/notes-lettering/strokes.ts 由它生成，specimen.py 的书写样张也用它。
+[POS]: scripts/wiggle 的书写动画导出器。字体与手写字标共用骨架；vault/notes-lettering/strokes.ts 由它生成，specimen.py 的书写样张也用它。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 
-    uv run --system-certs --no-project scripts/scrawl/lettering.py Notes src/vault/notes-lettering/strokes.ts
+    uv run --system-certs --no-project scripts/wiggle/lettering.py Notes src/vault/notes-lettering/strokes.ts
 
 骨架本来就记着每一笔的中心线与书写顺序，所以字标的书写动画不必再手描：
 每笔单独扫出墨迹轮廓，遮罩笔沿笔尖实际走过的轨迹（含手抖与回钩）揭开它；全部笔画并起来正是字体里的字形。
@@ -155,7 +155,7 @@ def to_ts(word, strokes):
                     f'    progress: {progress},\n'
                     f'  }},')
     return f'''/**
- * [INPUT]: 由 scripts/scrawl/lettering.py 从 Z1 Scrawl 骨架生成（pnpm font:scrawl 连同字体一起重建），勿手改
+ * [INPUT]: 由 scripts/wiggle/lettering.py 从 Wiggle Wiggle 骨架生成（pnpm font:wiggle 连同字体一起重建），勿手改
  * [OUTPUT]: LETTERING（viewBox 宽高与遮罩笔宽）、STROKES（{word} 每笔的笔迹 d、墨迹 outline 与书写节奏）
  * [POS]: vault/notes-lettering 的书写数据层。NotesLettering 只负责播放；字形与笔顺的真相源是字体骨架。
  * [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md

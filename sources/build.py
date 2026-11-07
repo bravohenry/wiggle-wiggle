@@ -5,15 +5,15 @@
 """
 [INPUT]: 依赖 glyphs.py 的 GLYPHS/POSE/COUNTERS/SPACING/METRICS；依赖 pen.py 的 Nib 与 sweep_glyph；
          依赖 fontTools 的 FontBuilder、T2CharStringPen、feaLib；--specimen 时依赖 specimen.py
-[OUTPUT]: --out 目录下的 Z1Scrawl-{Light,Regular,Bold}.woff2（calt 轮换 + ss01/ss02 沸腾帧，name 表内嵌 OFL-1.1）；
+[OUTPUT]: --out 目录下的 WiggleWiggle-{Light,Regular,Bold}.woff2（calt 轮换 + ss01/ss02 沸腾帧，name 表内嵌 OFL-1.1）；
          --weight 只建某档；--otf 另存 OTF；--specimen 写 README 样张 SVG；--site 写网站用的字体清单与无底样张；
          export 供 release.py 复用同一条落盘流程；
          glyph_layout 与 shape 供 lettering.py、specimen.py 取同坐标的骨架与同规则的排字
-[POS]: scripts/scrawl 的入口与装配器。骨架与笔模型各在一处，它只负责「几支笔、几份异体、怎么排、怎么装」。
-       本文件原样镜像到开源仓库 bravohenry/z1-scrawl 的 sources/，所以不写死 z1 的目录。
+[POS]: scripts/wiggle 的入口与装配器。骨架与笔模型各在一处，它只负责「几支笔、几份异体、怎么排、怎么装」。
+       本文件原样镜像到开源仓库 bravohenry/wiggle-wiggle 的 sources/，所以不写死 z1 的目录。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 
-    uv run scripts/scrawl/build.py --out public/fonts [--otf DIR] [--specimen DIR] [--site DIR]
+    uv run scripts/wiggle/build.py --out public/fonts [--otf DIR] [--specimen DIR] [--site DIR]
 
 手写字体最大的破绽是同一字母重复两次长得一模一样。
 每个字形生成 ALTS 份种子异体，calt 按「前一个字是第几份」轮换，ll、ee、oo 永远不撞脸。
@@ -39,7 +39,7 @@ import glyphs as G
 from pen import Nib, sweep_glyph
 
 # ── 字体身份与参数：改风格只改这里 ─────────────────────────────
-FAMILY = "Z1 Scrawl"
+FAMILY = "Wiggle Wiggle"
 VERSION = "1.000"
 STAMP = "Fri Nov  6 00:00:00 2026"   # head 表时间戳钉死：同一骨架必须构建出逐字节相同的字体
 UPM = 1000
@@ -53,7 +53,7 @@ class Weight:
         self.style, self.wght, self.radius, self.widen = style, wght, radius, widen
         self.nib = Nib(radius=radius)
         self.lift = radius          # 中心线整体上提一个笔半径，墨底落在基线
-        self.ps_name = f"Z1Scrawl-{style}"
+        self.ps_name = f"WiggleWiggle-{style}"
 
 
 # Regular 的笔宽 ≈ 76 ≈ 大写墨高的 0.10（参考图 13 字实测均值 0.103）。Light 是细马克笔，Bold 是粗 Sharpie。
@@ -69,7 +69,7 @@ WOBBLE = {"rot": 5.0, "sx": 0.07, "sy": 0.08, "dy": 30.0, "jit": 16.0, "sb": 18.
 SIDEBEARING = (30, 30)
 SPACE = 260
 DESIGNER = "Zihan Huang"
-REPO = "https://github.com/bravohenry/z1-scrawl"
+REPO = "https://github.com/bravohenry/wiggle-wiggle"
 OFL = "https://openfontlicense.org"
 # OpenType 特性（标签, 名称）：_features 写进字体，manifest 写给网站，两处同源
 FEATURES = (("calt", "Contextual alternates"), ("ss01", "Boil frame 2"), ("ss02", "Boil frame 3"))

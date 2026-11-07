@@ -1,12 +1,12 @@
-<img src="images/hero.svg" width="100%" alt="Z1 Scrawl. Make it the one.">
+<img src="images/hero.svg" width="100%" alt="Wiggle Wiggle. Make it the one.">
 
-# Z1 Scrawl
+# Wiggle Wiggle
 
 A graffiti marker font that never holds still. Each character is written three times by a shaky hand, and the line can boil at 12 frames per second, like the hand-drawn animation in the *Spider-Verse* films.
 
-Z1 Scrawl is the house typeface of [z1han.com](https://z1han.com). It is free and open source under the [SIL Open Font License 1.1](OFL.txt).
+Wiggle Wiggle is the house typeface of [z1han.com](https://z1han.com). It is free and open source under the [SIL Open Font License 1.1](OFL.txt).
 
-**[Download the latest release](https://github.com/bravohenry/z1-scrawl/releases/latest)**, or try every weight and character at [z1han.com/font](https://z1han.com/font).
+**[Download the latest release](https://github.com/bravohenry/wiggle-wiggle/releases/latest)**, or try every weight and character at [z1han.com/font](https://z1han.com/font).
 
 ## Written, not drawn
 
@@ -26,9 +26,9 @@ One skeleton, three pens. Light is a fine marker and Bold is a fat one. Bold wid
 
 | Style | Weight | Desktop | Web |
 |---|---|---|---|
-| Light | 300 | `Z1Scrawl-Light.otf` | `Z1Scrawl-Light.woff2` |
-| Regular | 400 | `Z1Scrawl-Regular.otf` | `Z1Scrawl-Regular.woff2` |
-| Bold | 700 | `Z1Scrawl-Bold.otf` | `Z1Scrawl-Bold.woff2` |
+| Light | 300 | `WiggleWiggle-Light.otf` | `WiggleWiggle-Light.woff2` |
+| Regular | 400 | `WiggleWiggle-Regular.otf` | `WiggleWiggle-Regular.woff2` |
+| Bold | 700 | `WiggleWiggle-Bold.otf` | `WiggleWiggle-Bold.woff2` |
 
 ## Character set
 
@@ -63,7 +63,7 @@ To animate a line, stack three copies and show one at a time, 12 times per secon
 ```
 
 ```css
-.boil { display: inline-grid; font-family: "Z1 Scrawl"; }
+.boil { display: inline-grid; font-family: "Wiggle Wiggle"; }
 .boil > * { grid-area: 1 / 1; }
 .boil > :nth-child(2) { font-feature-settings: "ss01"; opacity: 0; }
 .boil > :nth-child(3) { font-feature-settings: "ss02"; opacity: 0; }
@@ -88,26 +88,26 @@ Load the WOFF2 files from this repository through jsDelivr, or copy them from [`
 
 ```css
 @font-face {
-  font-family: "Z1 Scrawl";
-  src: url("https://cdn.jsdelivr.net/gh/bravohenry/z1-scrawl@v1.000/fonts/woff2/Z1Scrawl-Light.woff2") format("woff2");
+  font-family: "Wiggle Wiggle";
+  src: url("https://cdn.jsdelivr.net/gh/bravohenry/wiggle-wiggle@v1.000/fonts/woff2/WiggleWiggle-Light.woff2") format("woff2");
   font-weight: 300;
   font-display: swap;
 }
 @font-face {
-  font-family: "Z1 Scrawl";
-  src: url("https://cdn.jsdelivr.net/gh/bravohenry/z1-scrawl@v1.000/fonts/woff2/Z1Scrawl-Regular.woff2") format("woff2");
+  font-family: "Wiggle Wiggle";
+  src: url("https://cdn.jsdelivr.net/gh/bravohenry/wiggle-wiggle@v1.000/fonts/woff2/WiggleWiggle-Regular.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
-  font-family: "Z1 Scrawl";
-  src: url("https://cdn.jsdelivr.net/gh/bravohenry/z1-scrawl@v1.000/fonts/woff2/Z1Scrawl-Bold.woff2") format("woff2");
+  font-family: "Wiggle Wiggle";
+  src: url("https://cdn.jsdelivr.net/gh/bravohenry/wiggle-wiggle@v1.000/fonts/woff2/WiggleWiggle-Bold.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
 ```
 
-For desktop apps, install the OTF files from [`fonts/otf`](fonts/otf) or from the [latest release](https://github.com/bravohenry/z1-scrawl/releases/latest).
+For desktop apps, install the OTF files from [`fonts/otf`](fonts/otf) or from the [latest release](https://github.com/bravohenry/wiggle-wiggle/releases/latest).
 
 ## How it is made
 

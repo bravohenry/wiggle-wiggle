@@ -2,7 +2,7 @@
 [INPUT]: 依赖 build.py 的 shape/glyph_name/WEIGHTS/SPACE（与字体同一套排字规则）；依赖 lettering.py 的 letter/schedule/open_path（逐笔书写数据）
 [OUTPUT]: write_all(built, out_dir, names, card)：README 样张 SVG——hero（12 帧/秒沸腾）、write（逐笔书写后沸腾）、anatomy（骨架 × 笔）、
           weights、charset、alternates；card=False 出无底版本，z1han.com/font 放进自己的羽化黄面板
-[POS]: scripts/scrawl 的样张器。build.py --specimen 调它；字形直接取内存轮廓转 SVG 路径，不依赖系统装了什么字体。
+[POS]: scripts/wiggle 的样张器。build.py --specimen 调它；字形直接取内存轮廓转 SVG 路径，不依赖系统装了什么字体。
        开源仓库的 README 用 <img> 引这些 SVG：动画只用 SVG 内的 CSS，GitHub 的图片沙箱里也能播。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 
@@ -17,7 +17,7 @@ import lettering as L
 # ── 版面：站点的黄底墨（globals.css 的 --yellow 与 --ink-on-yellow） ─────
 PAPER, INK = "#fef991", "#171717"
 WIDTH, MARGIN, RADIUS = 1200, 64, 28
-BOIL_FPS = 12                      # 与 kernel/scrawl-boil 的 BOIL_FPS 同拍
+BOIL_FPS = 12                      # 与 kernel/wiggle-boil 的 BOIL_FPS 同拍
 BOIL_MS = 1000 / BOIL_FPS
 STYLE_KEY = {"Light": "L", "Regular": "R", "Bold": "B"}
 
@@ -98,9 +98,12 @@ def _boil_css(prefix):
 
 def hero(built):
     sh = Sheet(built, 520)
+    # 家族名读 build.FAMILY，不抄第二份；字号 230 封顶，三帧里最宽的一帧也要留出左右页边
+    widest = max(sh.measure(B.FAMILY, frame=f) for f in range(3))
+    size = min(230, (WIDTH - 2 * MARGIN) * B.UPM / widest)
     for f in range(3):
         sh.body.append(f'<g class="h{f}">'
-                       + sh.centered("Z1 Scrawl", 290, 230, frame=f)
+                       + sh.centered(B.FAMILY, 290, size, frame=f)
                        + sh.centered("Make it the one.", 430, 88, frame=f) + "</g>")
     sh.css.append(_boil_css("h"))
     return sh

@@ -1,4 +1,4 @@
-Copyright 2026 Zihan Huang (https://github.com/bravohenry/z1-scrawl)
+Copyright 2026 Zihan Huang (https://github.com/bravohenry/wiggle-wiggle)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

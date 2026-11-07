@@ -1,7 +1,7 @@
 """
 [INPUT]: 依赖 skia-pathops 的 Path.simplify（非零环绕并集）；骨架点来自 glyphs.py
 [OUTPUT]: 对外提供 Nib 笔参数、sweep_glyph（骨架 → 闭合三次贝塞尔轮廓）、sweep_strokes（逐笔轮廓与笔尖轨迹）、noise/fbm 噪声原语
-[POS]: scripts/scrawl 的马克笔笔模型。build.py 调它出每个字形与异体；它不认识字体格式。
+[POS]: scripts/wiggle 的马克笔笔模型。build.py 调它出每个字形与异体；它不认识字体格式。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 
 笔模型 = 圆头毡尖沿中心线扫掠：
