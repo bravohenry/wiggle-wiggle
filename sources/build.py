@@ -6,13 +6,14 @@
 [INPUT]: 依赖 glyphs.py 的 GLYPHS/POSE/COUNTERS/SPACING/METRICS；依赖 pen.py 的 Nib 与 sweep_glyph；
          依赖 fontTools 的 FontBuilder、T2CharStringPen、feaLib；--specimen 时依赖 specimen.py
 [OUTPUT]: --out 目录下的 Z1Scrawl-{Light,Regular,Bold}.woff2（calt 轮换 + ss01/ss02 沸腾帧，name 表内嵌 OFL-1.1）；
-         --weight 只建某档；--otf 另存 OTF；--specimen 写 README 样张 SVG；export 供 release.py 复用同一条落盘流程；
+         --weight 只建某档；--otf 另存 OTF；--specimen 写 README 样张 SVG；--site 写网站用的字体清单与无底样张；
+         export 供 release.py 复用同一条落盘流程；
          glyph_layout 与 shape 供 lettering.py、specimen.py 取同坐标的骨架与同规则的排字
 [POS]: scripts/scrawl 的入口与装配器。骨架与笔模型各在一处，它只负责「几支笔、几份异体、怎么排、怎么装」。
        本文件原样镜像到开源仓库 bravohenry/z1-scrawl 的 sources/，所以不写死 z1 的目录。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 
-    uv run scripts/scrawl/build.py --out public/fonts [--otf DIR] [--specimen DIR]
+    uv run scripts/scrawl/build.py --out public/fonts [--otf DIR] [--specimen DIR] [--site DIR]
 
 手写字体最大的破绽是同一字母重复两次长得一模一样。
 每个字形生成 ALTS 份种子异体，calt 按「前一个字是第几份」轮换，ll、ee、oo 永远不撞脸。
@@ -21,9 +22,11 @@ ss01/ss02 是线条沸腾的第 2、3 帧：lookup 排在 calt 之后，把整�
 种子由字名派生：同样的骨架永远构建出逐字节相同的字体。
 """
 import argparse
+import json
 import math
 import random
 import zlib
+from datetime import datetime
 from pathlib import Path
 
 from fontTools.agl import UV2AGL
@@ -65,8 +68,11 @@ REGULAR = WEIGHTS["Regular"]
 WOBBLE = {"rot": 5.0, "sx": 0.07, "sy": 0.08, "dy": 30.0, "jit": 16.0, "sb": 18.0, "base": 0.8}
 SIDEBEARING = (30, 30)
 SPACE = 260
+DESIGNER = "Zihan Huang"
 REPO = "https://github.com/bravohenry/z1-scrawl"
 OFL = "https://openfontlicense.org"
+# OpenType 特性（标签, 名称）：_features 写进字体，manifest 写给网站，两处同源
+FEATURES = (("calt", "Contextual alternates"), ("ss01", "Boil frame 2"), ("ss02", "Boil frame 3"))
 
 
 def glyph_name(ch):
@@ -213,8 +219,8 @@ lookup boil2 {{
   sub @a1 by @b;
   sub @a2 by @a1;
 }} boil2;
-feature ss01 {{ featureNames {{ name "Boil frame 2"; }}; lookup boil1; }} ss01;
-feature ss02 {{ featureNames {{ name "Boil frame 3"; }}; lookup boil2; }} ss02;
+feature ss01 {{ featureNames {{ name "{FEATURES[1][1]}"; }}; lookup boil1; }} ss01;
+feature ss02 {{ featureNames {{ name "{FEATURES[2][1]}"; }}; lookup boil2; }} ss02;
 """
 
 
@@ -241,14 +247,14 @@ def shape(text, frame=0):
 def _names(weight):
     """Regular/Bold 进四样式组（RIBBI）；其余字重按惯例另起旧式家族名，并用 16/17 号名声明真家族。"""
     names = {
-        "copyright": f"Copyright 2026 Zihan Huang ({REPO})",
+        "copyright": f"Copyright 2026 {DESIGNER} ({REPO})",
         "familyName": FAMILY,
         "styleName": weight.style,
         "uniqueFontIdentifier": f"{VERSION};Z1;{weight.ps_name}",
         "fullName": f"{FAMILY} {weight.style}",
         "version": f"Version {VERSION}",
         "psName": weight.ps_name,
-        "designer": "Zihan Huang",
+        "designer": DESIGNER,
         "vendorURL": REPO,
         "designerURL": "https://z1han.com",
         "licenseDescription": "This Font Software is licensed under the SIL Open Font License, Version 1.1. "
@@ -315,9 +321,30 @@ def build(weight=REGULAR):
     return fb.font, outlines, widths
 
 
-def export(out, otf=None, specimen_dir=None, styles=None):
-    """建字重并落盘：WOFF2 进 out，OTF 进 otf，README 样张进 specimen_dir。release.py 与命令行共用。"""
-    built = {}
+def manifest(sizes):
+    """网站用的字体清单：身份、授权、字符集、特性与各字重 WOFF2 大小。与字体同一次构建写出，z1han.com/font 只读它。"""
+    released = datetime.strptime(STAMP, "%a %b %d %H:%M:%S %Y")
+    return {
+        "family": FAMILY,
+        "version": VERSION,
+        "released": released.strftime("%Y-%m"),
+        "designer": DESIGNER,
+        "repository": REPO,
+        "license": {"id": "OFL-1.1", "name": "SIL Open Font License 1.1", "url": OFL},
+        "unitsPerEm": UPM,
+        "alternates": ALTS,
+        "characters": "".join(G.GLYPHS),
+        "glyphs": len(G.GLYPHS) * ALTS,
+        "features": [{"tag": tag, "name": name} for tag, name in FEATURES],
+        "weights": [{"style": w.style, "weight": w.wght, "file": w.ps_name, "woff2": sizes[w.style]}
+                    for w in WEIGHTS.values()],
+    }
+
+
+def export(out, otf=None, specimen_dir=None, styles=None, site_dir=None):
+    """建字重并落盘：WOFF2 进 out，OTF 进 otf，README 样张进 specimen_dir，网站清单与无底样张进 site_dir。
+    release.py 与命令行共用。"""
+    built, sizes = {}, {}
     for style in styles or list(WEIGHTS):
         weight = WEIGHTS[style]
         font, outlines, widths = build(weight)
@@ -329,10 +356,16 @@ def export(out, otf=None, specimen_dir=None, styles=None):
         out.mkdir(parents=True, exist_ok=True)
         path = out / f"{weight.ps_name}.woff2"
         font.save(path)
-        print(f"  woff2 {path.stat().st_size / 1024:.1f} KB · {len(outlines)} glyphs → {path}")
-    if specimen_dir:
+        sizes[style] = path.stat().st_size
+        print(f"  woff2 {sizes[style] / 1024:.1f} KB · {len(outlines)} glyphs → {path}")
+    if specimen_dir or site_dir:
         import specimen
-        specimen.write_all(built, specimen_dir)
+        if specimen_dir:
+            specimen.write_all(built, specimen_dir)
+        if site_dir:
+            specimen.write_all(built, site_dir, names=("write", "anatomy"), card=False)
+            (site_dir / "font.json").write_text(json.dumps(manifest(sizes), ensure_ascii=False, indent=2) + "\n")
+            print(f"  manifest → {site_dir / 'font.json'}")
 
 
 def main():
@@ -341,8 +374,9 @@ def main():
     ap.add_argument("--weight", choices=list(WEIGHTS), action="append", help="只建指定字重；缺省三档全建")
     ap.add_argument("--otf", type=Path, help="另存桌面安装版 OTF 的目录")
     ap.add_argument("--specimen", type=Path, help="写 README 样张 SVG 的目录；需三档全建")
+    ap.add_argument("--site", type=Path, help="写网站字体清单 font.json 与无底样张的目录；需三档全建")
     args = ap.parse_args()
-    export(args.out, args.otf, args.specimen, args.weight)
+    export(args.out, args.otf, args.specimen, args.weight, args.site)
 
 
 if __name__ == "__main__":

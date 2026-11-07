@@ -1,7 +1,7 @@
 """
 [INPUT]: 依赖 build.py 的 shape/glyph_name/WEIGHTS/SPACE（与字体同一套排字规则）；依赖 lettering.py 的 letter/schedule/open_path（逐笔书写数据）
-[OUTPUT]: write_all(built, out_dir)：README 样张 SVG——hero（12 帧/秒沸腾）、write（逐笔书写后沸腾）、anatomy（骨架 × 笔）、
-          weights、charset、alternates
+[OUTPUT]: write_all(built, out_dir, names, card)：README 样张 SVG——hero（12 帧/秒沸腾）、write（逐笔书写后沸腾）、anatomy（骨架 × 笔）、
+          weights、charset、alternates；card=False 出无底版本，z1han.com/font 放进自己的羽化黄面板
 [POS]: scripts/scrawl 的样张器。build.py --specimen 调它；字形直接取内存轮廓转 SVG 路径，不依赖系统装了什么字体。
        开源仓库的 README 用 <img> 引这些 SVG：动画只用 SVG 内的 CSS，GitHub 的图片沙箱里也能播。
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
@@ -17,7 +17,7 @@ import lettering as L
 # ── 版面：站点的黄底墨（globals.css 的 --yellow 与 --ink-on-yellow） ─────
 PAPER, INK = "#fef991", "#171717"
 WIDTH, MARGIN, RADIUS = 1200, 64, 28
-BOIL_FPS = 12                      # 与 OpeningAct.BOIL_FPS 同拍
+BOIL_FPS = 12                      # 与 kernel/scrawl-boil 的 BOIL_FPS 同拍
 BOIL_MS = 1000 / BOIL_FPS
 STYLE_KEY = {"Light": "L", "Regular": "R", "Bold": "B"}
 
@@ -74,11 +74,12 @@ class Sheet:
         w = self.measure(text, kw.get("style", "Regular"), kw.get("frame", 0), kw.get("track", 0)) * size / B.UPM
         return self.line(text, (WIDTH - w) / 2, base, size, **kw)
 
-    def svg(self):
+    def svg(self, card=True):
+        """card=False 不画黄底卡片：网站把样张放进自己的羽化黄面板，底与边缘由页面负责。"""
         style = f"<style>{''.join(self.css)}</style>" if self.css else ""
+        ground = f'<rect width="{WIDTH}" height="{self.h}" rx="{RADIUS}" fill="{PAPER}"/>' if card else ""
         return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{self.h}" viewBox="0 0 {WIDTH} {self.h}">'
-                f"{style}<defs>{''.join(self.defs.values())}</defs>"
-                f'<rect width="{WIDTH}" height="{self.h}" rx="{RADIUS}" fill="{PAPER}"/>'
+                f"{style}<defs>{''.join(self.defs.values())}</defs>{ground}"
                 f'<g fill="{INK}">{"".join(self.body)}</g></svg>\n')
 
 
@@ -102,7 +103,7 @@ def hero(built):
                        + sh.centered("Z1 Scrawl", 290, 230, frame=f)
                        + sh.centered("Make it the one.", 430, 88, frame=f) + "</g>")
     sh.css.append(_boil_css("h"))
-    return sh.svg()
+    return sh
 
 
 def write(built, word="z1han!", size=300, slow=1.5, boil_ms=2000, fade_ms=450, rest_ms=600):
@@ -169,7 +170,7 @@ def write(built, word="z1han!", size=300, slow=1.5, boil_ms=2000, fade_ms=450, r
     sh.body.append(f'<g class="wf">{"".join(frames)}</g>')
     sh.css.append(".w1,.w2{opacity:0}@media (prefers-reduced-motion:no-preference){"
                   + "".join(css) + flicker(0) + flicker(1) + flicker(2) + fade + "}")
-    return sh.svg()
+    return sh
 
 
 def anatomy(built, word="Rag", size=380):
@@ -193,7 +194,7 @@ def anatomy(built, word="Rag", size=380):
                    f'<path d="{"".join(lines)}" fill="none" stroke="{INK}" stroke-width="2.5" '
                    f'stroke-linecap="round" stroke-linejoin="round"/>'
                    f'<g fill="{PAPER}" stroke="{INK}" stroke-width="2.5">{"".join(dots)}</g>')
-    return sh.svg()
+    return sh
 
 
 def weights(built):
@@ -202,7 +203,7 @@ def weights(built):
         base = 170 + i * 150
         sh.body.append(sh.line(style, MARGIN, base, 52, style=style))
         sh.body.append(sh.line("Make it the one!", 340, base, 118, style=style))
-    return sh.svg()
+    return sh
 
 
 CHARSET = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz", "0123456789 &@#$%*+=<>^~|",
@@ -217,7 +218,7 @@ def charset(built, track=24):
     for i, row in enumerate(CHARSET):
         sh.body.append(sh.line(row, MARGIN, MARGIN + size * 0.9 + i * step, size, track=track))
     sh.h = round(MARGIN * 2 + size * 0.9 + (len(CHARSET) - 1) * step + size * 0.25)
-    return sh.svg()
+    return sh
 
 
 def alternates(built, chars="aegR", size=128):
@@ -231,18 +232,19 @@ def alternates(built, chars="aegR", size=128):
             x += (w + 30) * size / B.UPM
         x += gap
     sh.body.append(sh.line("little balloon, all three", MARGIN, 380, 100))
-    return sh.svg()
+    return sh
 
 
 SHEETS = {"hero": hero, "write": write, "anatomy": anatomy, "weights": weights, "charset": charset, "alternates": alternates}
 
 
-def write_all(built, out_dir):
+def write_all(built, out_dir, names=None, card=True):
+    """names 缺省写全部样张；card=False 写无底版本给网站。"""
     missing = set(B.WEIGHTS) - set(built)
     if missing:
-        raise SystemExit(f"--specimen 需要三档全建，缺 {', '.join(sorted(missing))}")
+        raise SystemExit(f"样张需要三档全建，缺 {', '.join(sorted(missing))}")
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name, render in SHEETS.items():
+    for name in names or SHEETS:
         path = Path(out_dir) / f"{name}.svg"
-        path.write_text(render(built))
+        path.write_text(SHEETS[name](built).svg(card))
         print(f"  specimen {path.stat().st_size / 1024:.0f} KB → {path}")

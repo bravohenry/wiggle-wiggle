@@ -6,7 +6,7 @@ A graffiti marker font that never holds still. Each character is written three t
 
 Z1 Scrawl is the house typeface of [z1han.com](https://z1han.com). It is free and open source under the [SIL Open Font License 1.1](OFL.txt).
 
-**[Download](https://github.com/bravohenry/z1-scrawl/releases/latest)** · [Use on the web](#use-on-the-web) · [Make it boil](#make-it-boil) · [How it is made](#how-it-is-made)
+**[Download the latest release](https://github.com/bravohenry/z1-scrawl/releases/latest)**, or try every weight and character at [z1han.com/font](https://z1han.com/font).
 
 ## Written, not drawn
 
@@ -24,11 +24,11 @@ The thin line is the path of the pen tip. Hollow dots are skeleton points. Solid
 
 One skeleton, three pens. Light is a fine marker and Bold is a fat one. Bold widens narrow letters so that their counters stay open.
 
-| Style | Weight | Files |
-|---|---|---|
-| Light | 300 | `Z1Scrawl-Light.otf` · `Z1Scrawl-Light.woff2` |
-| Regular | 400 | `Z1Scrawl-Regular.otf` · `Z1Scrawl-Regular.woff2` |
-| Bold | 700 | `Z1Scrawl-Bold.otf` · `Z1Scrawl-Bold.woff2` |
+| Style | Weight | Desktop | Web |
+|---|---|---|---|
+| Light | 300 | `Z1Scrawl-Light.otf` | `Z1Scrawl-Light.woff2` |
+| Regular | 400 | `Z1Scrawl-Regular.otf` | `Z1Scrawl-Regular.woff2` |
+| Bold | 700 | `Z1Scrawl-Bold.otf` | `Z1Scrawl-Bold.woff2` |
 
 ## Character set
 
